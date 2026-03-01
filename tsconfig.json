@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@application/*": ["application/*"],
+      "@repositories/*": ["application/repositories/*"],
+      "@use-cases/*": ["application/use-cases/*"],
+      "@domain/*": ["domain/*"],
+      "@entities/*": ["domain/entities/*"],
+      "@factories/*": ["domain/factories/*"],
+      "@util-types/*": ["types/utils/*"],
+      "@infrastructure/*": ["infrastructure/*"],
+      "@utils/*": ["utils/*"],
+      "@lowdb-repositories/*": [
+        "infrastructure/persistence/lowdb/repositories/*"
+      ],
+      "@express-controllers/*": [
+        "infrastructure/presentation/http/express/controllers/*"
+      ],
+      "@appwrite/*": ["infrastructure/persistence/appwrite/*"],
+      "@appwrite-repositories/*": [
+        "infrastructure/persistence/appwrite/repositories/*"
+      ],
+      "@appwrite-models/*": ["infrastructure/persistence/appwrite/models/*"],
+      "@appwrite-entities/*": [
+        "infrastructure/persistence/appwrite/entities/*"
+      ],
+      "@services/*": ["infrastructure/services/*"]
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "lib": ["ES2020"],
+    "types": ["node"],
+    "typeRoots": [
+      "./src/infrastructure/presentation/http/express/types/",
+      "./node_modules/@types/"
+    ]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

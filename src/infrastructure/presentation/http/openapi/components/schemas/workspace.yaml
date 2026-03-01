@@ -1,0 +1,24 @@
+﻿Workspace:
+  type: object
+  required: [id, name, createdAt]
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+
+CreateWorkspaceRequest:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+
+UpdateWorkspaceRequest:
+  type: object
+  properties:
+    name:
+      type: string

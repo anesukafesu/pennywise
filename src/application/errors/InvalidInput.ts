@@ -1,0 +1,1 @@
+﻿class InvalidInput extends Error {}

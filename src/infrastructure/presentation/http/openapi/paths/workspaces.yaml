@@ -1,0 +1,68 @@
+﻿collection:
+  get:
+    summary: List workspaces
+    tags: [Workspaces]
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../components/schemas/workspace.yaml#/Workspace
+
+  post:
+    summary: Create workspace
+    tags: [Workspaces]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/workspace.yaml#/CreateWorkspaceRequest
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: ../components/schemas/workspace.yaml#/Workspace
+
+resource:
+  get:
+    summary: Get workspace
+    tags: [Workspaces]
+    parameters:
+      - $ref: ../components/parameters/workspace-id.yaml
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../components/schemas/workspace.yaml#/Workspace
+
+  patch:
+    summary: Update workspace
+    tags: [Workspaces]
+    parameters:
+      - $ref: ../components/parameters/workspace-id.yaml
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/workspace.yaml#/UpdateWorkspaceRequest
+    responses:
+      '200':
+        description: Updated
+
+  delete:
+    summary: Delete workspace
+    tags: [Workspaces]
+    parameters:
+      - $ref: ../components/parameters/workspace-id.yaml
+    responses:
+      '204':
+        description: Deleted

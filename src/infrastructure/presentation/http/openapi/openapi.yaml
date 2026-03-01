@@ -1,0 +1,56 @@
+﻿openapi: 3.1.0
+info:
+  title: Pennywise API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/v1
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/login:
+    $ref: ./paths/auth.yaml#/login
+  /auth/refresh:
+    $ref: ./paths/auth.yaml#/refresh
+
+  /me:
+    $ref: ./paths/users.yaml#/me
+
+  /workspaces:
+    $ref: ./paths/workspaces.yaml#/collection
+  /workspaces/{workspaceId}:
+    $ref: ./paths/workspaces.yaml#/resource
+
+  /workspaces/{workspaceId}/invites:
+    $ref: ./paths/invites.yaml#/create
+
+  /invites/{inviteId}/accept:
+    $ref: ./paths/invites.yaml#/accept
+
+  /categories:
+    $ref: ./paths/categories.yaml#/collection
+
+  /budgets:
+    $ref: ./paths/budgets.yaml#/collection
+
+  /budgets/{budgetId}/line-items:
+    $ref: ./paths/budgets.yaml#/lineItems
+
+  /transactions:
+    $ref: ./paths/transactions.yaml#/collection
+
+  /transactions/{transactionId}/post:
+    $ref: ./paths/transactions.yaml#/post
+
+  /reports/budget-vs-actual:
+    $ref: ./paths/reports.yaml#/budgetVsActual
+
+components:
+  schemas:
+    $ref: ./components/schemas
+  parameters:
+    $ref: ./components/parameters
+  securitySchemes:
+    $ref: ./components/security.yaml

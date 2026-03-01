@@ -1,0 +1,6 @@
+node_modules
+.env.pennywise
+.env.appwrite
+todo.txt
+.idea
+dist
