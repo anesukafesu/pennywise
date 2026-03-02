@@ -1,5 +1,5 @@
 import { BackgroundEmailSendingService } from "@application/ports/services/EmailSendingService";
-import { PasswordResetOtpRepository } from "@application/ports/repositories/PasswordResetOtpRepository";
+import { OtpRepository } from "@application/ports/repositories/OtpRepository";
 import { PasswordPolicy } from "@application/ports/services/PasswordPolicy";
 import { NotFound } from "@application/errors/NotFound";
 import { CredentialRepository } from "@application/ports/repositories/CredentialRepository";
@@ -8,7 +8,7 @@ import { PasswordHasher } from "@application/ports/services/PasswordHasher";
 
 interface ResetPasswordUseCaseDependencies {
   emailSendingService: BackgroundEmailSendingService;
-  passwordResetOtpRepository: PasswordResetOtpRepository;
+  passwordResetOtpRepository: OtpRepository;
   passwordPolicy: PasswordPolicy;
   passwordHasher: PasswordHasher;
   credentialRepository: CredentialRepository;
