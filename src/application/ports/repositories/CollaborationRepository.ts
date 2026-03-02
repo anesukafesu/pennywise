@@ -24,6 +24,11 @@ export interface CollaborationRepository {
     tx?: TransactionContext,
   ): Promise<Collaboration[]>;
 
+  getManyByWorkspaceId(
+    workspaceId: UUID,
+    tx?: TransactionContext,
+  ): Promise<Collaboration[]>;
+
   doesUserOwnWorkspaces(
     userId: UUID,
     tx?: TransactionContext,
