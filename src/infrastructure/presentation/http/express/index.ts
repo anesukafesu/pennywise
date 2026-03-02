@@ -6,7 +6,7 @@ import { createUseCases } from "@infrastructure/presentation/http/express/compos
 import { createServer } from "@infrastructure/presentation/http/express/composition/server";
 
 const sessionMiddleware = await createSessionMiddleware();
-const infrastructure = createInfrastructure();
+const infrastructure = await createInfrastructure();
 const useCases = createUseCases(infrastructure);
 const controllers = createControllers(useCases);
 const router = createAppRouter(controllers);

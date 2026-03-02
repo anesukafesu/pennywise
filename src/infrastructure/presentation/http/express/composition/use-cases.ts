@@ -35,7 +35,7 @@ import { UpdateWorkspaceUseCase } from "@use-cases/workspaces/UpdateWorkspace";
 export function createUseCases({
   repositories,
   services,
-}: ReturnType<typeof createInfrastructure>) {
+}: Awaited<ReturnType<typeof createInfrastructure>>) {
   /* ---------- Auth ---------- */
   const authenticateUserWithEmailAndPassword =
     new SignInWithEmailAndPasswordUseCase({
