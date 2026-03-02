@@ -83,8 +83,16 @@ export class UpdateTransactionUseCase {
     await transactionRepository.updateOne(updatedTransaction);
 
     return {
-      ...transaction,
-      categoryName: category.name,
+      id: transaction.id,
+      date: updatedTransaction.date,
+      workspaceId: transaction.workspaceId,
+      amount: updatedTransaction.amount,
+      category: {
+        id: category.id,
+        name: category.name,
+      },
+      notes: updatedTransaction.notes,
+      documentationUrl: updatedTransaction.documentationUrl,
     };
   }
 }

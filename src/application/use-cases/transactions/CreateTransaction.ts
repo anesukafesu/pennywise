@@ -5,7 +5,6 @@ import { CollaborationRepository } from "@application/ports/repositories/Collabo
 import { ensureActorIsAuthenticated } from "@application/guards/ensureActorIsAuthenticated";
 import { ensureResourceExistsInWorkspace } from "@application/guards/ensureResourceExistsInWorkspace";
 import { IDGenerator } from "@application/ports/services/IDGenerator";
-import { mapTransactionsToDTOs } from "@application/mappers/mapTransactionsToDTOs";
 import { UUID } from "node:crypto";
 import { ensureActorHasAccessToWorkspace } from "@application/guards/ensureActorHasAccessToWorkspace";
 import { CategoryRepository } from "@application/ports/repositories/CategoryRepository";
@@ -75,8 +74,16 @@ export class CreateTransactionUseCase {
     await transactionRepository.createOne(transaction);
 
     return {
-      ...transaction,
-      categoryName: category.name,
+      id: transaction.id,
+      date: transaction.date,
+      workspaceId: transaction.workspaceId,
+      amount: transaction.amount,
+      category: {
+        id: category.id,
+        name: category.name,
+      },
+      notes: transaction.notes,
+      documentationUrl: transaction.documentationUrl,
     };
   }
 }
