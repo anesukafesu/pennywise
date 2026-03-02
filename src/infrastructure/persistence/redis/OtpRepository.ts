@@ -12,7 +12,7 @@ export class RedisOtpRepository implements OtpRepository {
     identifier: string,
     otp: string,
   ): Promise<void> {
-    this.client.set(`${purpose}:${identifier}`, otp, {
+    this.client.set(`otp-${purpose}:${identifier}`, otp, {
       EX: 600, // OTP expires in 10 minutes
     });
   }
@@ -21,6 +21,6 @@ export class RedisOtpRepository implements OtpRepository {
     purpose: OtpPurpose,
     identifier: string,
   ): Promise<string | null> {
-    return await this.client.get(`${purpose}:${identifier}`);
+    return await this.client.get(`otp-${purpose}:${identifier}`);
   }
 }
