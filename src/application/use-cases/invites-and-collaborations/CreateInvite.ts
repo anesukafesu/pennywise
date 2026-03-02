@@ -1,8 +1,7 @@
 ﻿import { InviteDTO } from "@application/dtos/InviteDTO";
-import { ensureActorIsAuthenticated } from "@application/guards/ensureActorIsAuthenticated";
-import { ensureActorHasNoExistingCollaboration } from "@application/guards/ensureNoExistingCollaborationsForUser";
+import { ensureUserHasNoExistingCollaboration } from "@application/guards/ensureUserHasNoExistingCollaboration";
 import { ensureResourceExists } from "@application/guards/ensureResourceExists";
-import { ensureActorHasNoExistingInvite } from "@application/guards/ensureActorHasNoExistingInvite";
+import { ensureUserHasNoExistingInvite } from "@application/guards/ensureUserHasNoExistingInvite";
 import { ensureActorOwnsWorkspace } from "@application/guards/ensureActorOwnsWorkspace";
 import { Actor } from "@entities/Actor";
 import { UUID } from "node:crypto";
@@ -11,6 +10,8 @@ import { InviteRepository } from "@application/ports/repositories/InviteReposito
 import { WorkspaceRepository } from "@application/ports/repositories/WorkspaceRepository";
 import { Invite } from "@entities/Invite";
 import { IDGenerator } from "@application/ports/services/IDGenerator";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { createInviteDTOs } from "@application/mappers/createInviteDTOs";
 
 const INVITE_EXPIRATION_MONTHS = 1;
 
@@ -18,6 +19,7 @@ interface CreateInviteDependencies {
   inviteRepository: InviteRepository;
   collaborationRepository: CollaborationRepository;
   workspaceRepository: WorkspaceRepository;
+  userRepository: UserRepository;
   idGenerator: IDGenerator;
 }
 
@@ -36,11 +38,10 @@ export class CreateInviteUseCase {
     const {
       inviteRepository,
       collaborationRepository,
+      userRepository,
       idGenerator,
       workspaceRepository,
     } = this.dependencies;
-
-    ensureActorIsAuthenticated(actor);
 
     await ensureResourceExists(
       "workspace",
@@ -55,14 +56,20 @@ export class CreateInviteUseCase {
       collaborationRepository,
     );
 
-    await ensureActorHasNoExistingCollaboration(
-      actor,
+    const invitee = await ensureResourceExists(
+      "user",
+      details.inviteeId,
+      userRepository,
+    );
+
+    await ensureUserHasNoExistingCollaboration(
+      invitee,
       details.workspaceId,
       collaborationRepository,
     );
 
-    await ensureActorHasNoExistingInvite(
-      actor,
+    await ensureUserHasNoExistingInvite(
+      invitee,
       details.workspaceId,
       inviteRepository,
     );
@@ -76,7 +83,9 @@ export class CreateInviteUseCase {
 
     await inviteRepository.createOne(invite);
 
-    return { ...invite };
+    const inviteDTO = createInviteDTOs([invite], [invitee])[0];
+
+    return inviteDTO;
   }
 
   private createFutureDate(monthsBeforeExpiration: number) {
