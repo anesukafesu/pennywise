@@ -38,7 +38,10 @@ export class ResetPasswordUseCase {
       credentialRepository,
     } = this.dependencies;
 
-    const correctToken = await passwordResetOtpRepository.retrieveOtp(email);
+    const correctToken = await passwordResetOtpRepository.retrieveOtp(
+      "password_reset",
+      email,
+    );
 
     if (correctToken === null) {
       throw new Error("Password reset token not found for the provided email.");
