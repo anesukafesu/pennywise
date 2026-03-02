@@ -5,6 +5,7 @@ import { AppwriteDatabaseService } from "@appwrite/client/AppwriteDatabaseServic
 import { User as UserEntity } from "@entities/User";
 import { UserMapper } from "@infrastructure/persistence/appwrite/mappers/User";
 import { Query } from "node-appwrite";
+import { UUID } from "node:crypto";
 
 export class AppwriteUserRepository implements UserRepository {
   private readonly tableId = "users";
@@ -46,6 +47,19 @@ export class AppwriteUserRepository implements UserRepository {
 
     if (rows.length === 0) return undefined;
     return UserMapper.fromPersistence(rows[0]);
+  }
+
+  async getManyByIds(
+    ids: UUID[],
+    tx?: TransactionContext,
+  ): Promise<UserEntity[]> {
+    const { rows } = await this.db.listRows<AppwriteUserRow>({
+      tableId: this.tableId,
+      queries: [Query.equal("id", ids)],
+      tx: tx,
+    });
+
+    return rows.map(UserMapper.fromPersistence);
   }
 
   async updateOne(user: UserEntity, tx?: TransactionContext): Promise<void> {
