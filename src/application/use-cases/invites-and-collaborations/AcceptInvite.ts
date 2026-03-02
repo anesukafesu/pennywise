@@ -1,7 +1,7 @@
 ﻿import { Forbidden } from "@application/errors/Forbidden";
 import { ensureActorIsAuthenticated } from "@application/guards/ensureActorIsAuthenticated";
 import { ensureInviteHasNotExpired } from "@application/guards/ensureInviteHasNotExpired";
-import { ensureActorHasNoExistingCollaboration } from "@application/guards/ensureNoExistingCollaborationsForUser";
+import { ensureUserHasNoExistingCollaboration } from "@application/guards/ensureUserHasNoExistingCollaboration";
 import { ensureResourceExists } from "@application/guards/ensureResourceExists";
 import { Actor } from "@entities/Actor";
 import { InviteRepository } from "@application/ports/repositories/InviteRepository";
@@ -50,7 +50,7 @@ export class AcceptInviteUseCase {
       throw new Forbidden(actor.id, `Accept invite (${actor.id}).`);
     }
 
-    await ensureActorHasNoExistingCollaboration(
+    await ensureUserHasNoExistingCollaboration(
       actor,
       invite.workspaceId,
       collaborationRepository,
