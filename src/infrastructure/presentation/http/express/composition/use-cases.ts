@@ -142,6 +142,7 @@ export function createUseCases({
     inviteRepository: repositories.invite,
     collaborationRepository: repositories.collaboration,
     workspaceRepository: repositories.workspace,
+    userRepository: repositories.user,
     idGenerator: services.idGenerator,
   });
 
