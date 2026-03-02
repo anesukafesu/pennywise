@@ -56,6 +56,19 @@ export class AppwriteInviteRepository implements InviteRepository {
     return InviteMapper.fromPersistence(rows[0]);
   }
 
+  async getManyByWorkspaceId(
+    workspaceId: UUID,
+    tx?: TransactionContext,
+  ): Promise<InviteEntity[]> {
+    const { rows } = await this.db.listRows<AppwriteInviteRow>({
+      tableId: this.tableId,
+      queries: [Query.equal("workspaceId", workspaceId)],
+      tx: tx,
+    });
+
+    return rows.map(InviteMapper.fromPersistence);
+  }
+
   async deleteManyByWorkspaceId(
     workspaceId: UUID,
     tx?: TransactionContext,
