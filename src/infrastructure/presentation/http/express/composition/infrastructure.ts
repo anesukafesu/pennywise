@@ -26,7 +26,7 @@ export async function createInfrastructure() {
   );
 
   const redisOtpClient = createClient({
-    url: process.env.REDIS_OTP_REPOSITORY_URL!,
+    url: process.env.REDIS_URL!,
   });
 
   return {
