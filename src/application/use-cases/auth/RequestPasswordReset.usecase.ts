@@ -1,11 +1,11 @@
 ﻿import { PasswordResetOtpRepository } from "@application/ports/repositories/PasswordResetOtpRepository";
-import { EmailSendingService } from "@application/ports/services/EmailSendingService";
-import { PasswordResetTokenGenerator } from "@application/ports/services/PasswordResetTokenGenerator";
+import { BackgroundEmailSendingService } from "@application/ports/services/EmailSendingService";
+import { OtpGenerator } from "@application/ports/services/OtpGenerator";
 
 interface RequestPasswordResetDependencies {
   passwordResetOtpRepository: PasswordResetOtpRepository;
-  passwordResetTokenGenerator: PasswordResetTokenGenerator;
-  emailService: EmailSendingService;
+  passwordResetTokenGenerator: OtpGenerator;
+  emailService: BackgroundEmailSendingService;
 }
 
 interface RequestPasswordResetInput {
@@ -26,11 +26,11 @@ export class RequestPasswordResetUseCase {
       emailService,
     } = this.dependencies;
 
-    const resetToken = await passwordResetTokenGenerator.generateToken();
+    const resetToken = passwordResetTokenGenerator.generate();
 
     await passwordResetOtpRepository.storeOtp(input.data.email, resetToken);
 
-    await emailService.send({
+    await emailService.addToQueue({
       to: input.data.email,
       subject: "Password Reset Request",
       textBody: this.generateEmailBody(resetToken),
