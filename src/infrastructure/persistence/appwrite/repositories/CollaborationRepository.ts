@@ -68,6 +68,19 @@ export class AppwriteCollaborationRepository implements CollaborationRepository 
     return rows.map(CollaborationMapper.fromPersistence);
   }
 
+  async getManyByWorkspaceId(
+    workspaceId: UUID,
+    tx?: TransactionContext,
+  ): Promise<Collaboration[]> {
+    const { rows } = await this.db.listRows<AppwriteCollaborationRow>({
+      tableId: this.tableId,
+      queries: [Query.equal("workspaceId", workspaceId)],
+      tx: tx,
+    });
+
+    return rows.map(CollaborationMapper.fromPersistence);
+  }
+
   async doesUserOwnWorkspaces(
     userId: UUID,
     tx?: TransactionContext,
