@@ -1,4 +1,4 @@
-import { EmailSendingService } from "@application/ports/services/EmailSendingService";
+import { BackgroundEmailSendingService } from "@application/ports/services/EmailSendingService";
 import { PasswordResetOtpRepository } from "@application/ports/repositories/PasswordResetOtpRepository";
 import { PasswordPolicy } from "@application/ports/services/PasswordPolicy";
 import { NotFound } from "@application/errors/NotFound";
@@ -7,7 +7,7 @@ import { Credential } from "@domain/entities/Credential";
 import { PasswordHasher } from "@application/ports/services/PasswordHasher";
 
 interface ResetPasswordUseCaseDependencies {
-  emailSendingService: EmailSendingService;
+  emailSendingService: BackgroundEmailSendingService;
   passwordResetOtpRepository: PasswordResetOtpRepository;
   passwordPolicy: PasswordPolicy;
   passwordHasher: PasswordHasher;
@@ -66,7 +66,7 @@ export class ResetPasswordUseCase {
 
     await credentialRepository.update(updatedCredential);
 
-    await emailSendingService.send({
+    await emailSendingService.addToQueue({
       to: email,
       subject: "Your password has been reset",
       textBody: this.generateEmailBody(),
