@@ -1,8 +1,13 @@
 ﻿import { UUID } from "node:crypto";
 
 export interface InviteDTO {
+  id: UUID;
+  workspaceId: UUID;
+  expiresOn: Date;
+  user: {
     id: UUID;
-    userId: UUID;
-    workspaceId: UUID;
-    expiresOn: Date;
+    email: string;
+    name: string;
+    avatarUrl: string | null;
+  };
 }
