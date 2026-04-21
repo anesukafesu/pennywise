@@ -21,6 +21,12 @@ Key features include:
 
 ---
 
+## API Documentation
+
+Detailed backend API documentation is available at [`docs/API.md`](docs/API.md).
+
+---
+
 # Production Setup
 
 1. Create an Appwrite Cloud account.
