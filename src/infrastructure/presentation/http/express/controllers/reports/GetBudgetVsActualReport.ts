@@ -10,8 +10,8 @@ export class GetBudgetVsActualReportController {
       actor: request.actor,
       details: {
         workspaceId: request.params.workspaceId as UUID,
-        month: request.params.month,
-        year: request.params.year,
+        month: Number(request.params.month),
+        year: Number(request.params.year),
       },
     });
 
