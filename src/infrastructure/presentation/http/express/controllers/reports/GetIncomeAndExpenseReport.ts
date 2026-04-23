@@ -10,8 +10,8 @@ export class GetIncomeAndExpenseReportController {
       actor: request.actor,
       details: {
         workspaceId: request.params.workspaceId as UUID,
-        year: request.body.year,
-        month: request.body.month,
+        year: request.params.year,
+        month: request.params.month,
       },
     });
 
