@@ -10,7 +10,7 @@ export function createServer(
   const app = express();
 
   app.use(cors({
-    origin: "http://localhost:8080",
+    origin: true,
     credentials: true
   }));
   
