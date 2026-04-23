@@ -72,8 +72,8 @@ export class AppwriteTransactionRepository implements TransactionRepository {
       queries: [
         Query.select(["categoryId", "amount"]),
         Query.equal("workspaceId", workspaceId),
-        Query.greaterThanEqual("date", startDate),
-        Query.lessThan("date", endDate)
+        Query.greaterThanEqual("date", startDate.toISOString()),
+        Query.lessThan("date", endDate.toISOString())
       ],
       tx: tx,
     });
