@@ -8,6 +8,7 @@ export function createServer(
   sessionMiddleware: Awaited<ReturnType<typeof createSessionMiddleware>>,
 ) {
   const app = express();
+  app.set('trust proxy', 1);
 
   app.use(cors({
     origin: true,
