@@ -7,6 +7,7 @@ export function createServer(
   sessionMiddleware: Awaited<ReturnType<typeof createSessionMiddleware>>,
 ) {
   const app = express();
+  app.set("trust proxy", 1);
   app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "http://localhost:8080");
     res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
