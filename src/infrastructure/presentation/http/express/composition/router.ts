@@ -128,12 +128,12 @@ export function createAppRouter(
 
   /* ---------- Reports ---------- */
   router.get(
-    "/workspaces/:workspaceId/reports/budget-vs-actual",
+    "/workspaces/:workspaceId/reports/budget-vs-actual/:year/:month",
     adaptController(controllers.getBudgetVsActualReport),
   );
 
   router.get(
-    "/workspaces/:workspaceId/reports/income-expense",
+    "/workspaces/:workspaceId/reports/income-expense/:year/:month",
     adaptController(controllers.getIncomeAndExpenseReport),
   );
 
