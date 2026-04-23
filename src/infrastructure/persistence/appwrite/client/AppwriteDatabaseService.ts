@@ -64,6 +64,7 @@ export class AppwriteDatabaseService {
     try {
       return await fn();
     } catch (e) {
+      console.log(e); // TODO: Add better logging in future.
       if (e instanceof AppwriteException) {
         throw new DatabaseError(`Database Error ${e.code}: e.message.`);
       }
