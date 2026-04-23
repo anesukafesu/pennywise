@@ -52,6 +52,8 @@ export class AppwriteCategoryRepository implements CategoryRepository {
     ids: UUID[],
     tx?: TransactionContext,
   ): Promise<Category[]> {
+    if (ids.length === 0) return [];
+    
     const { rows } = await this.db.listRows<AppwriteCategoryRow>({
       tableId: this.tableName,
       queries: [Query.equal("$id", ids)],
