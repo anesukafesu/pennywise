@@ -67,7 +67,7 @@ export class AppwriteTransactionRepository implements TransactionRepository {
     const { rows } = await this.db.listRows<Row>({
       tableId: this.tableId,
       queries: [
-        Query.select(["categoryId", "total"]),
+        Query.select(["categoryId", "amount"]),
         Query.equal("workspaceId", workspaceId),
         Query.equal("month", month),
         Query.equal("year", year),
