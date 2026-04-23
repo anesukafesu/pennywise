@@ -22,7 +22,7 @@ export async function createInfrastructure() {
     process.env.APPWRITE_ENDPOINT!,
     process.env.APPWRITE_PROJECT!,
     process.env.APPWRITE_API_KEY!,
-    process.env.DATABASE_ID!,
+    process.env.APPWRITE_DATABASE_ID!,
   );
 
   const redisOtpClient = createClient({
