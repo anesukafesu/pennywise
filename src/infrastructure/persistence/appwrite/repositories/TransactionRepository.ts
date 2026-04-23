@@ -64,13 +64,16 @@ export class AppwriteTransactionRepository implements TransactionRepository {
       amount: number;
     }
 
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 1));
+
     const { rows } = await this.db.listRows<Row>({
       tableId: this.tableId,
       queries: [
         Query.select(["categoryId", "amount"]),
         Query.equal("workspaceId", workspaceId),
-        Query.equal("month", month),
-        Query.equal("year", year),
+        Query.greaterThanEqual("date", startDate),
+        Query.lessThan("date", endDate)
       ],
       tx: tx,
     });
