@@ -23,7 +23,7 @@ export async function createSessionMiddleware() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "none",
     },
   });
