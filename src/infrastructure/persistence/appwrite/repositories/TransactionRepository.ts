@@ -64,8 +64,8 @@ export class AppwriteTransactionRepository implements TransactionRepository {
       amount: number;
     }
 
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 1));
+    const startDate = new Date(Date.UTC(year, month, 1));
+    const endDate = new Date(Date.UTC(year, month + 1, 1));
 
     const { rows } = await this.db.listRows<Row>({
       tableId: this.tableId,
