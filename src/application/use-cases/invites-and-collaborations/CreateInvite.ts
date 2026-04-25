@@ -12,6 +12,7 @@ import { Invite } from "@entities/Invite";
 import { IDGenerator } from "@application/ports/services/IDGenerator";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { createInviteDTOs } from "@application/mappers/createInviteDTOs";
+import { NotFound } from "@application/errors/NotFound";
 
 const INVITE_EXPIRATION_MONTHS = 1;
 
@@ -27,7 +28,7 @@ interface CreateInviteInput {
   actor: Actor;
   details: {
     workspaceId: UUID;
-    inviteeId: UUID;
+    email: string;
   };
 }
 
@@ -56,11 +57,11 @@ export class CreateInviteUseCase {
       collaborationRepository,
     );
 
-    const invitee = await ensureResourceExists(
-      "user",
-      details.inviteeId,
-      userRepository,
-    );
+    const invitee = await userRepository.getOneByEmail(details.email);
+
+    if (!invitee) {
+      throw new NotFound(`User with email: ${details.email} does not exist`);
+    }
 
     await ensureUserHasNoExistingCollaboration(
       invitee,
@@ -76,7 +77,7 @@ export class CreateInviteUseCase {
 
     const invite = new Invite(
       idGenerator.generate(),
-      details.inviteeId,
+      invitee.id,
       details.workspaceId,
       this.createFutureDate(INVITE_EXPIRATION_MONTHS),
     );
