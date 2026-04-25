@@ -9,8 +9,6 @@ export class UpdateBudgetLineItemController {
     const updatedBudgetLineItem = await this.useCase.execute({
       actor: request.actor,
       details: {
-        lineItemId: request.params.lineItemId as UUID,
-        categoryId: request.body.categoryId,
         amount: request.body.amount,
       },
     });
