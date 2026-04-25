@@ -10,7 +10,7 @@ export class CreateInviteController {
       actor: request.actor,
       details: {
         workspaceId: request.params.workspaceId as UUID,
-        inviteeId: request.body.inviteeId,
+        email: request.body.email,
       },
     });
 
