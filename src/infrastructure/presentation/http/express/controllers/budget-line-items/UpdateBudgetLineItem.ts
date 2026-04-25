@@ -1,4 +1,4 @@
-﻿import { UpdateBudgetLineItemUseCase } from "@use-cases/budget-line-items/UpdateBudgetLineItem";
+import { UpdateBudgetLineItemUseCase } from "@use-cases/budget-line-items/UpdateBudgetLineItem";
 import { Request, Response } from "express";
 import { UUID } from "node:crypto";
 
@@ -9,7 +9,7 @@ export class UpdateBudgetLineItemController {
     const updatedBudgetLineItem = await this.useCase.execute({
       actor: request.actor,
       details: {
-        lineItemId: request.body.lineItemId,
+        lineItemId: request.params.lineItemId as UUID,
         amount: request.body.amount,
       },
     });
