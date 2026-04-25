@@ -54,8 +54,8 @@ export class AppwriteTransactionRepository implements TransactionRepository {
 
   async getCategoryTotalsForMonth(
     workspaceId: UUID,
-    month: number,
     year: number,
+    month: number,
     tx?: TransactionContext,
   ): Promise<{ categoryId: UUID; total: number }[]> {
     // TODO: Perform this aggregation on the database using a custom function
