@@ -9,7 +9,7 @@ export class DeleteBudgetLineItemController {
     await this.useCase.execute({
       actor: req.actor,
       details: {
-        budgetLineItemId: req.params.budgetLineItemId as UUID,
+        lineItemId: req.params.lineItemId as UUID,
       },
     });
 

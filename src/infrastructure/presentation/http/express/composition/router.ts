@@ -25,6 +25,8 @@ export function createAppRouter(
 
   router.use(requireAuth);
 
+  router.post("/auth/sign-out", adaptController(controllers.signOut));
+
   /* ---------- Workspaces ---------- */
   router.post("/workspaces", adaptController(controllers.createWorkspace));
 
@@ -101,9 +103,21 @@ export function createAppRouter(
   );
 
   /* ---------- Invites & Collaborations ---------- */
+  router.get("/invites", adaptController(controllers.getIncomingInvites));
+
   router.post(
     "/workspaces/:workspaceId/invites",
     adaptController(controllers.createInvite),
+  );
+
+  router.get(
+    "/workspaces/:workspaceId/invites",
+    adaptController(controllers.getWorkspaceInvites),
+  );
+
+  router.get(
+    "/workspaces/:workspaceId/collaborators",
+    adaptController(controllers.getWorkspaceCollaborators),
   );
 
   router.post(
@@ -128,8 +142,18 @@ export function createAppRouter(
 
   /* ---------- Reports ---------- */
   router.get(
+    "/workspaces/:workspaceId/reports/budget-vs-actual",
+    adaptController(controllers.getBudgetVsActualReport),
+  );
+
+  router.get(
     "/workspaces/:workspaceId/reports/budget-vs-actual/:year/:month",
     adaptController(controllers.getBudgetVsActualReport),
+  );
+
+  router.get(
+    "/workspaces/:workspaceId/reports/income-expense",
+    adaptController(controllers.getIncomeAndExpenseReport),
   );
 
   router.get(

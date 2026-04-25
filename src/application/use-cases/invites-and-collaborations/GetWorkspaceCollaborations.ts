@@ -29,7 +29,7 @@ export class GetWorkspaceCollaborationsUseCase {
   }: GetWorkspaceCollaborationsUseCaseInput): Promise<CollaborationDTO[]> {
     const { collaborationRepository, userRepository } = this.dependencies;
 
-    ensureActorHasAccessToWorkspace(
+    await ensureActorHasAccessToWorkspace(
       actor,
       details.workspaceId,
       "Get workspace collaborations",

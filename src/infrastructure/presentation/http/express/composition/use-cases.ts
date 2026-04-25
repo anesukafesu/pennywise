@@ -17,6 +17,9 @@ import { AcceptInviteUseCase } from "@use-cases/invites-and-collaborations/Accep
 import { CreateInviteUseCase } from "@use-cases/invites-and-collaborations/CreateInvite";
 import { DeclineInviteUseCase } from "@use-cases/invites-and-collaborations/DeclineInvite";
 import { DeleteCollaborationUseCase } from "@use-cases/invites-and-collaborations/DeleteCollaboration";
+import { GetIncomingInvitesUseCase } from "@use-cases/invites-and-collaborations/GetIncomingInvites";
+import { GetWorkspaceCollaborationsUseCase } from "@use-cases/invites-and-collaborations/GetWorkspaceCollaborations";
+import { GetWorkspaceInvitesUseCase } from "@use-cases/invites-and-collaborations/GetWorkspaceInvites.usecase";
 import { TransferWorkspaceOwnershipUseCase } from "@use-cases/invites-and-collaborations/TransferWorkspaceOwnership";
 import { GetBudgetVsActualReportUseCase } from "@use-cases/reports/GetBudgetVsActualReport";
 import { GetIncomeAndExpenseReportUseCase } from "@use-cases/reports/GetIncomeAndExpenseReport";
@@ -166,6 +169,22 @@ export function createUseCases({
     transactionRunner: services.transactionRunner,
   });
 
+  const getIncomingInvites = new GetIncomingInvitesUseCase({
+    inviteRepository: repositories.invite,
+    userRepository: repositories.user,
+  });
+
+  const getWorkspaceCollaborations = new GetWorkspaceCollaborationsUseCase({
+    collaborationRepository: repositories.collaboration,
+    userRepository: repositories.user,
+  });
+
+  const getWorkspaceInvites = new GetWorkspaceInvitesUseCase({
+    collaborationRepository: repositories.collaboration,
+    inviteRepository: repositories.invite,
+    userRepository: repositories.user,
+  });
+
   /* ---------- Reports ---------- */
 
   const getBudgetVsActualReport = new GetBudgetVsActualReportUseCase({
@@ -284,6 +303,9 @@ export function createUseCases({
     declineInvite,
     deleteCollaboration,
     transferWorkspaceOwnership,
+    getIncomingInvites,
+    getWorkspaceCollaborations,
+    getWorkspaceInvites,
 
     getBudgetVsActualReport,
     getIncomeAndExpenseReport,
