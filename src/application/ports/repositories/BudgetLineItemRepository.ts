@@ -29,6 +29,11 @@ export interface BudgetLineItemRepository {
     tx?: TransactionContext,
   ): Promise<boolean>;
 
+  updateOne(
+    budgetLineItem: BudgetLineItem,
+    tx?: TransactionContext,
+  ): Promise<void>;
+
   deleteOneById(id: UUID, tx?: TransactionContext): Promise<void>;
 
   deleteManyByBudgetId(

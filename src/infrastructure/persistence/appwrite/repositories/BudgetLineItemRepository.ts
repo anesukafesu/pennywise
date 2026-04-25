@@ -68,6 +68,18 @@ export class AppwriteBudgetLineItemRepository implements BudgetLineItemRepositor
     return rows.map(BudgetLineItemMapper.fromPersistence);
   }
 
+  async updateOne(
+    budgetLineItem: BudgetLineItem,
+    tx?: TransactionContext,
+  ): Promise<void> {
+    await this.db.updateRow({
+      tableId: this.tableId,
+      rowId: budgetLineItem.id,
+      data: BudgetLineItemMapper.toPersistence(budgetLineItem),
+      tx: tx,
+    });
+  }
+
   async includesCategory(
     categoryId: string,
     tx?: TransactionContext,

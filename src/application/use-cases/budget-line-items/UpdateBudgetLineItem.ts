@@ -1,15 +1,15 @@
 import { BudgetLineItemDTO } from "@application/dtos/BudgetLineItemDTO";
+import { ensureActorHasAccessToWorkspace } from "@application/guards/ensureActorHasAccessToWorkspace";
 import { ensureActorIsAuthenticated } from "@application/guards/ensureActorIsAuthenticated";
-import { Actor } from "@entities/Actor";
-import { BudgetLineItem } from "@entities/BudgetLineItem";
+import { ensureResourceExists } from "@application/guards/ensureResourceExists";
+import { ensureResourceExistsInWorkspace } from "@application/guards/ensureResourceExistsInWorkspace";
 import { BudgetLineItemRepository } from "@application/ports/repositories/BudgetLineItemRepository";
 import { BudgetRepository } from "@application/ports/repositories/BudgetRepository";
 import { CategoryRepository } from "@application/ports/repositories/CategoryRepository";
 import { CollaborationRepository } from "@application/ports/repositories/CollaborationRepository";
-import { ensureCategoryIsUnusedInBudget } from "@application/guards/ensureCategoryIsUnusedInBudget";
-import { ensureResourceExists } from "@application/guards/ensureResourceExists";
-import { ensureResourceExistsInWorkspace } from "@application/guards/ensureResourceExistsInWorkspace";
-import { ensureActorHasAccessToWorkspace } from "@application/guards/ensureActorHasAccessToWorkspace";
+import { InvalidInput } from "@domain/errors/InvalidInput";
+import { Actor } from "@entities/Actor";
+import { BudgetLineItem } from "@entities/BudgetLineItem";
 import { UUID } from "node:crypto";
 
 interface UpdateBudgetLineItemDependencies {
@@ -23,7 +23,7 @@ interface UpdateBudgetLineItemInput {
   actor: Actor;
   details: {
     lineItemId: UUID;
-    amount: number;
+    amount?: number;
   };
 }
 
@@ -45,8 +45,8 @@ export class UpdateBudgetLineItemUseCase {
 
     ensureActorIsAuthenticated(actor);
 
-    if (Object.keys(details).length === 0) {
-      throw new InvalidInput("Expected at least one property to update.");
+    if (details.amount === undefined) {
+      throw new InvalidInput("The budget line item amount is required.");
     }
 
     const existingBudgetLineItem = await ensureResourceExists(
@@ -57,7 +57,7 @@ export class UpdateBudgetLineItemUseCase {
 
     const budget = await ensureResourceExists(
       "budget",
-      budgetLineItem.budgetId,
+      existingBudgetLineItem.budgetId,
       budgetRepository,
     );
 
@@ -68,8 +68,15 @@ export class UpdateBudgetLineItemUseCase {
       collaborationRepository,
     );
 
+    const category = await ensureResourceExistsInWorkspace(
+      "category",
+      existingBudgetLineItem.categoryId,
+      budget.workspaceId,
+      categoryRepository,
+    );
+
     const updatedBudgetLineItem = new BudgetLineItem(
-      existingBudgetLineItem.id
+      existingBudgetLineItem.id,
       existingBudgetLineItem.budgetId,
       existingBudgetLineItem.categoryId,
       details.amount,
@@ -79,7 +86,7 @@ export class UpdateBudgetLineItemUseCase {
 
     return {
       id: updatedBudgetLineItem.id,
-      categoryId: budgetLineItem.categoryId,
+      categoryId: category.id,
       categoryName: category.name,
       amount: updatedBudgetLineItem.amount,
     };
