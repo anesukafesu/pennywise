@@ -23,8 +23,7 @@ interface UpdateBudgetLineItemInput {
   actor: Actor;
   details: {
     lineItemId: UUID;
-    categoryId?: UUID;
-    amount?: number;
+    amount: number;
   };
 }
 
@@ -50,7 +49,7 @@ export class UpdateBudgetLineItemUseCase {
       throw new InvalidInput("Expected at least one property to update.");
     }
 
-    const budgetLineItem = await ensureResourceExists(
+    const existingBudgetLineItem = await ensureResourceExists(
       "budgetLineItem",
       details.lineItemId,
       budgetLineItemRepository,
@@ -69,33 +68,18 @@ export class UpdateBudgetLineItemUseCase {
       collaborationRepository,
     );
 
-    if (details.categoryId) {
-      await ensureCategoryIsUnusedInBudget(
-        budgetLineItem.budgetId,
-        details.categoryId,
-        budgetLineItemRepository,
-      );
-    }
-
     const updatedBudgetLineItem = new BudgetLineItem(
-      details.lineItemId,
-      budget.id,
-      details.categoryId ?? budgetLineItem.categoryId,
-      details.amount ?? budgetLineItem.amount,
+      existingBudgetLineItem.id
+      existingBudgetLineItem.budgetId,
+      existingBudgetLineItem.categoryId,
+      details.amount,
     );
 
-    let category = await ensureResourceExistsInWorkspace(
-      "category",
-      updatedBudgetLineItem.categoryId,
-      budget.workspaceId,
-      categoryRepository,
-    );
-
-    await budgetLineItemRepository.createOne(updatedBudgetLineItem);
+    await budgetLineItemRepository.updateOne(updatedBudgetLineItem);
 
     return {
       id: updatedBudgetLineItem.id,
-      categoryId: updatedBudgetLineItem.categoryId,
+      categoryId: budgetLineItem.categoryId,
       categoryName: category.name,
       amount: updatedBudgetLineItem.amount,
     };
