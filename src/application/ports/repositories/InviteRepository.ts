@@ -18,6 +18,8 @@ export interface InviteRepository {
     tx?: TransactionContext,
   ): Promise<Invite[]>;
 
+  getManyByUserId(userId: UUID, tx?: TransactionContext): Promise<Invite[]>;
+
   deleteManyByWorkspaceId(
     workspaceId: UUID,
     tx?: TransactionContext,

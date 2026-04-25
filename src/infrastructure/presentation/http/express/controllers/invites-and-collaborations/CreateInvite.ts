@@ -11,6 +11,7 @@ export class CreateInviteController {
       details: {
         workspaceId: request.params.workspaceId as UUID,
         inviteeEmail: request.body.inviteeEmail,
+        inviteeId: request.body.inviteeId,
       },
     });
 

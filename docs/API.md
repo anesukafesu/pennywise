@@ -101,6 +101,12 @@ Sign in with existing credentials and start an authenticated session.
 **Response `204`**
 No response body.
 
+### `POST /auth/sign-out`
+Destroy the current authenticated session and clear the session cookie.
+
+**Response `204`**
+No response body.
+
 ---
 
 ## Users
@@ -265,18 +271,11 @@ Updated budget summary.
 ### `DELETE /budgets/:budgetId`
 Delete a budget.
 
-**Body (current implementation)**
-
-```json
-{
-  "budgetId": "uuid"
-}
-```
+**Body**
+No body required.
 
 **Response `204`**
 No response body.
-
-> Note: although the route contains `:budgetId`, the current controller reads `budgetId` from the body.
 
 ---
 
@@ -326,7 +325,6 @@ Delete a budget line item.
 **Response `204`**
 No response body.
 
-> Note: the route uses `:lineItemId`; the current controller reads `budgetLineItemId` from params, which may need alignment.
 
 ---
 
@@ -390,16 +388,46 @@ No response body.
 
 ## Invites and collaborations
 
+### `GET /invites`
+List incoming invites for the current user.
+
+**Response `200`**
+Array of invite objects.
+
+### `GET /workspaces/:workspaceId/collaborators`
+List collaborators in a workspace.
+
+**Response `200`**
+Array of collaboration objects.
+
+### `GET /workspaces/:workspaceId/invites`
+List invites sent for a workspace (owner-only).
+
+**Response `200`**
+Array of invite objects.
+
 ### `POST /workspaces/:workspaceId/invites`
 Create an invite.
 
 **Body**
+
+Preferred:
+
+```json
+{
+  "inviteeEmail": "invitee@example.com"
+}
+```
+
+Alternative (compatibility):
 
 ```json
 {
   "inviteeId": "uuid"
 }
 ```
+
+If both fields are provided, the API returns `400`.
 
 **Response `201`**
 
@@ -524,14 +552,14 @@ No response body.
 ### `GET /workspaces/:workspaceId/reports/budget-vs-actual`
 Get budget-vs-actual report.
 
-**Body (current implementation)**
+**Query parameters (canonical)**
 
-```json
-{
-  "year": 2026,
-  "month": 4
-}
-```
+- `year` (integer, 4-digit, range 1900-3000)
+- `month` (integer, 1-12)
+
+Example: `GET /workspaces/:workspaceId/reports/budget-vs-actual?year=2026&month=4`
+
+Compatibility route also supported: `GET /workspaces/:workspaceId/reports/budget-vs-actual/:year/:month`
 
 **Response `200`**
 
@@ -556,14 +584,14 @@ Get budget-vs-actual report.
 ### `GET /workspaces/:workspaceId/reports/income-expense`
 Get income-and-expense report.
 
-**Body (current implementation)**
+**Query parameters (canonical)**
 
-```json
-{
-  "year": 2026,
-  "month": 4
-}
-```
+- `year` (integer, 4-digit, range 1900-3000)
+- `month` (integer, 1-12)
+
+Example: `GET /workspaces/:workspaceId/reports/income-expense?year=2026&month=4`
+
+Compatibility route also supported: `GET /workspaces/:workspaceId/reports/income-expense/:year/:month`
 
 **Response `200`**
 
@@ -584,4 +612,3 @@ Get income-and-expense report.
 }
 ```
 
-> Note: both report endpoints currently read `year` and `month` from `req.body` even though the method is `GET`.

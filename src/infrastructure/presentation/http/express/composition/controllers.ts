@@ -1,4 +1,5 @@
 ﻿import { SignInWithEmailAndPasswordController } from "@express-controllers/auth/SignInWithEmailAndPassword";
+import { SignOutController } from "@express-controllers/auth/SignOut";
 import { SignUpWithEmailAndPasswordController } from "@express-controllers/auth/SignUpWithEmailAndPassword";
 import { CreateBudgetLineItemController } from "@express-controllers/budget-line-items/CreateBudgetLineItem";
 import { DeleteBudgetLineItemController } from "@express-controllers/budget-line-items/DeleteBudgetLineItem";
@@ -16,6 +17,9 @@ import { AcceptInviteController } from "@express-controllers/invites-and-collabo
 import { CreateInviteController } from "@express-controllers/invites-and-collaborations/CreateInvite";
 import { DeclineInviteController } from "@express-controllers/invites-and-collaborations/DeclineInvite";
 import { DeleteCollaborationController } from "@express-controllers/invites-and-collaborations/DeleteCollaboration";
+import { GetIncomingInvitesController } from "@express-controllers/invites-and-collaborations/GetIncomingInvites";
+import { GetWorkspaceCollaborationsController } from "@express-controllers/invites-and-collaborations/GetWorkspaceCollaborations";
+import { GetWorkspaceInvitesController } from "@express-controllers/invites-and-collaborations/GetWorkspaceInvites";
 import { TransferWorkspaceOwnershipController } from "@express-controllers/invites-and-collaborations/TransferWorkspaceOwnership";
 import { GetBudgetVsActualReportController } from "@express-controllers/reports/GetBudgetVsActualReport";
 import { GetIncomeAndExpenseReportController } from "@express-controllers/reports/GetIncomeAndExpenseReport";
@@ -42,6 +46,8 @@ export function createControllers(useCases: ReturnType<typeof createUseCases>) {
     signUpWithEmailAndPassword: new SignUpWithEmailAndPasswordController(
       useCases.signUpWithEmailAndPassword,
     ),
+
+    signOut: new SignOutController(),
 
     /* ---------- Budgets ---------- */
     createBudget: new CreateBudgetController(useCases.createBudget),
@@ -93,6 +99,18 @@ export function createControllers(useCases: ReturnType<typeof createUseCases>) {
 
     transferWorkspaceOwnership: new TransferWorkspaceOwnershipController(
       useCases.transferWorkspaceOwnership,
+    ),
+
+    getIncomingInvites: new GetIncomingInvitesController(
+      useCases.getIncomingInvites,
+    ),
+
+    getWorkspaceCollaborators: new GetWorkspaceCollaborationsController(
+      useCases.getWorkspaceCollaborations,
+    ),
+
+    getWorkspaceInvites: new GetWorkspaceInvitesController(
+      useCases.getWorkspaceInvites,
     ),
 
     /* ---------- Reports ---------- */

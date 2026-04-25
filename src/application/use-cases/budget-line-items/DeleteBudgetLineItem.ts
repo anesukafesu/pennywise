@@ -16,7 +16,7 @@ interface DeleteBudgetLineItemDependencies {
 interface DeleteBudgetLineItemInput {
   actor: Actor;
   details: {
-    budgetLineItemId: UUID;
+    lineItemId: UUID;
   };
 }
 
@@ -36,7 +36,7 @@ export class DeleteBudgetLineItemUseCase {
 
     const budgetLineItem = await ensureResourceExists(
       "budgetLineItem",
-      details.budgetLineItemId,
+      details.lineItemId,
       budgetLineItemRepository,
     );
 
@@ -53,6 +53,6 @@ export class DeleteBudgetLineItemUseCase {
       collaborationRepository,
     );
 
-    await budgetLineItemRepository.deleteOneById(details.budgetLineItemId);
+    await budgetLineItemRepository.deleteOneById(details.lineItemId);
   }
 }

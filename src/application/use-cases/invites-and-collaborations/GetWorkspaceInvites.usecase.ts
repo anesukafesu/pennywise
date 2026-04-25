@@ -30,7 +30,7 @@ export class GetWorkspaceInvitesUseCase {
     const { collaborationRepository, inviteRepository, userRepository } =
       this.dependencies;
 
-    ensureActorOwnsWorkspace(
+    await ensureActorOwnsWorkspace(
       actor,
       workspaceId,
       "Get Workspace Invites.",

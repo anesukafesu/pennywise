@@ -9,10 +9,10 @@ export class DeleteBudgetController {
     await this.useCase.execute({
       actor: request.actor,
       details: {
-        budgetId: request.body.budgetId as UUID,
+        budgetId: request.params.budgetId as UUID,
       },
     });
 
-    response.status(204).json(response);
+    response.status(204).end();
   }
 }

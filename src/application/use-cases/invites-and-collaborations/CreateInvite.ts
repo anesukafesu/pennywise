@@ -1,4 +1,4 @@
-﻿import { InviteDTO } from "@application/dtos/InviteDTO";
+import { InviteDTO } from "@application/dtos/InviteDTO";
 import { ensureUserHasNoExistingCollaboration } from "@application/guards/ensureUserHasNoExistingCollaboration";
 import { ensureResourceExists } from "@application/guards/ensureResourceExists";
 import { ensureUserHasNoExistingInvite } from "@application/guards/ensureUserHasNoExistingInvite";
@@ -13,6 +13,7 @@ import { IDGenerator } from "@application/ports/services/IDGenerator";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { createInviteDTOs } from "@application/mappers/createInviteDTOs";
 import { NotFound } from "@application/errors/NotFound";
+import { InvalidInput } from "@domain/errors/InvalidInput";
 
 const INVITE_EXPIRATION_MONTHS = 1;
 
@@ -28,7 +29,8 @@ interface CreateInviteInput {
   actor: Actor;
   details: {
     workspaceId: UUID;
-    inviteeEmail: string;
+    inviteeEmail?: string;
+    inviteeId?: UUID;
   };
 }
 
@@ -53,14 +55,27 @@ export class CreateInviteUseCase {
     await ensureActorOwnsWorkspace(
       actor,
       details.workspaceId,
-      `Create invite for ${details.inviteeId} to workspace ${details.workspaceId}`,
+      `Create invite for workspace ${details.workspaceId}`,
       collaborationRepository,
     );
 
-    const invitee = await userRepository.getOneByEmail(details.inviteeEmail);
+    const hasInviteeEmail = Boolean(details.inviteeEmail);
+    const hasInviteeId = Boolean(details.inviteeId);
+
+    if (!hasInviteeEmail && !hasInviteeId) {
+      throw new InvalidInput("Either inviteeEmail or inviteeId is required");
+    }
+
+    if (hasInviteeEmail && hasInviteeId) {
+      throw new InvalidInput("Provide either inviteeEmail or inviteeId, not both");
+    }
+
+    const invitee = details.inviteeEmail
+      ? await userRepository.getOneByEmail(details.inviteeEmail)
+      : await userRepository.getOneById(details.inviteeId!);
 
     if (!invitee) {
-      throw new NotFound(`User with email: ${details.email} does not exist`);
+      throw new NotFound("user");
     }
 
     await ensureUserHasNoExistingCollaboration(
