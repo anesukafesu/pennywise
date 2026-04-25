@@ -28,7 +28,7 @@ interface CreateInviteInput {
   actor: Actor;
   details: {
     workspaceId: UUID;
-    email: string;
+    inviteeEmail: string;
   };
 }
 
@@ -57,7 +57,7 @@ export class CreateInviteUseCase {
       collaborationRepository,
     );
 
-    const invitee = await userRepository.getOneByEmail(details.email);
+    const invitee = await userRepository.getOneByEmail(details.inviteeEmail);
 
     if (!invitee) {
       throw new NotFound(`User with email: ${details.email} does not exist`);
