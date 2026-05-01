@@ -1,29 +1,29 @@
-﻿import { AppwriteDatabaseService } from "@appwrite/client/AppwriteDatabaseService";
-import { AppwriteBudgetLineItemRepository } from "@appwrite/repositories/BudgetLineItemRepository";
-import { AppwriteBudgetRepository } from "@appwrite/repositories/BudgetRepository";
-import { AppwriteCategoryRepository } from "@appwrite/repositories/CategoryRepository";
-import { AppwriteCollaborationRepository } from "@appwrite/repositories/CollaborationRepository";
-import { AppwriteCredentialRepository } from "@appwrite/repositories/CredentialRepository";
-import { AppwriteInviteRepository } from "@appwrite/repositories/InviteRepository";
-import { AppwriteTransactionRepository } from "@appwrite/repositories/TransactionRepository";
-import { AppwriteUserRepository } from "@appwrite/repositories/UserRepository";
-import { AppwriteWorkspaceRepository } from "@appwrite/repositories/WorkspaceRepository";
 import { RedisOtpRepository } from "@infrastructure/persistence/redis/OtpRepository";
+import { PostgresDatabaseService } from "@infrastructure/persistence/postgres/client/PostgresDatabaseService";
+import { PostgresBudgetLineItemRepository } from "@infrastructure/persistence/postgres/repositories/BudgetLineItemRepository";
+import { PostgresBudgetRepository } from "@infrastructure/persistence/postgres/repositories/BudgetRepository";
+import { PostgresCategoryRepository } from "@infrastructure/persistence/postgres/repositories/CategoryRepository";
+import { PostgresCollaborationRepository } from "@infrastructure/persistence/postgres/repositories/CollaborationRepository";
+import { PostgresCredentialRepository } from "@infrastructure/persistence/postgres/repositories/CredentialRepository";
+import { PostgresInviteRepository } from "@infrastructure/persistence/postgres/repositories/InviteRepository";
+import { PostgresTransactionRepository } from "@infrastructure/persistence/postgres/repositories/TransactionRepository";
+import { PostgresUserRepository } from "@infrastructure/persistence/postgres/repositories/UserRepository";
+import { PostgresWorkspaceRepository } from "@infrastructure/persistence/postgres/repositories/WorkspaceRepository";
+import { PostgresTransactionRunner } from "@infrastructure/persistence/postgres/services/PostgresTransactionRunner";
 import { DefaultOTPGenerator } from "@infrastructure/services/default-otp-generator";
 import { MockBackgroundEmailSendingService } from "@infrastructure/services/mock-background-email-sending-service";
 import { RandomUUIDGenerator } from "@services/id-generator/IDGenerator";
 import { BcryptPasswordHasher } from "@services/password-hasher/PasswordHasher";
 import { DefaultPasswordPolicy } from "@services/password-policy/PasswordPolicy";
-import { AppwriteTransactionRunner } from "@services/transaction-runner/AppwriteTransactionRunner";
+import { Pool } from "pg";
 import { createClient } from "redis";
 
 export async function createInfrastructure() {
-  const db = new AppwriteDatabaseService(
-    process.env.APPWRITE_ENDPOINT!,
-    process.env.APPWRITE_PROJECT!,
-    process.env.APPWRITE_API_KEY!,
-    process.env.APPWRITE_DATABASE_ID!,
-  );
+  const postgresPool = new Pool({
+    connectionString: process.env.POSTGRES_CONNECTION_STRING!,
+  });
+
+  const db = new PostgresDatabaseService(postgresPool);
 
   const redisOtpClient = createClient({
     url: process.env.REDIS_URL!,
@@ -31,22 +31,22 @@ export async function createInfrastructure() {
 
   return {
     repositories: {
-      budget: new AppwriteBudgetRepository(db),
-      budgetLineItem: new AppwriteBudgetLineItemRepository(db),
-      category: new AppwriteCategoryRepository(db),
-      collaboration: new AppwriteCollaborationRepository(db),
-      credential: new AppwriteCredentialRepository(db),
-      invite: new AppwriteInviteRepository(db),
-      transaction: new AppwriteTransactionRepository(db),
-      user: new AppwriteUserRepository(db),
-      workspace: new AppwriteWorkspaceRepository(db),
+      budget: new PostgresBudgetRepository(db),
+      budgetLineItem: new PostgresBudgetLineItemRepository(db),
+      category: new PostgresCategoryRepository(db),
+      collaboration: new PostgresCollaborationRepository(db),
+      credential: new PostgresCredentialRepository(db),
+      invite: new PostgresInviteRepository(db),
+      transaction: new PostgresTransactionRepository(db),
+      user: new PostgresUserRepository(db),
+      workspace: new PostgresWorkspaceRepository(db),
     },
 
     services: {
       passwordHasher: new BcryptPasswordHasher(),
       passwordPolicy: new DefaultPasswordPolicy(),
       idGenerator: new RandomUUIDGenerator(),
-      transactionRunner: new AppwriteTransactionRunner(db),
+      transactionRunner: new PostgresTransactionRunner(db),
       otpGenerator: new DefaultOTPGenerator(),
       backgroundEmailSendingService: new MockBackgroundEmailSendingService(),
       otpRepository: new RedisOtpRepository(redisOtpClient),
