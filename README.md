@@ -7,8 +7,10 @@ A backend service for a budgeting and expense-tracking application.
 Pennywise is the backend service for a budgeting and expense tracking application.
 It provides APIs for managing users, budgets, accounts, and transactions.
 
-The system is designed with a Clean Architecture approach and integrates with
-Appwrite for authentication and database storage.
+The system is designed with a Clean Architecture approach and supports two persistence setups:
+
+- **Appwrite TablesDB**
+- **PostgreSQL**
 
 Key features include:
 
@@ -27,104 +29,133 @@ Detailed backend API documentation is available at [`docs/API.md`](docs/API.md).
 
 ---
 
-# Production Setup
+## Setup Options
 
-1. Create an Appwrite Cloud account.
-2. Create a new project.
-3. Generate an API key with **full access to the database service**.
-4. Install Docker on your production machine.
-5. Clone this repository and navigate to the root directory.
-6. Run the bootstrap script to initialize the database:
-
-```bash
-npm run bootstrap
-```
-
-7. Copy `.env.pennywise.example` to `.env.pennywise` and provide values for all required environment variables.
-8. Build the Docker image:
-
-```bash
-docker build -t pennywise-app .
-```
-
-9. Run the container:
-
-```bash
-docker run pennywise-app
-```
-
-> **Note about the bootstrap script**
-
-When Appwrite creates collections or attributes, the underlying work is handled asynchronously by background workers. As a result, Appwrite may return an HTTP `201` response before the resources are fully available.
-
-Because of this, the bootstrap script may fail when attempting to create indexes on attributes that have not yet finished initializing.
-
-The script is **idempotent**, meaning it can be safely re-run multiple times. If it fails, simply run the script again until all database resources are successfully created.
-
-A more robust solution for this behavior is still being explored.
+Choose one of the two setup modes below.
 
 ---
 
-# Development Setup
+## Option A — Run with Appwrite TablesDB
 
-1. Install Docker on your machine.
-2. Clone the repository and navigate to the project directory.
-3. Create the required environment files:
+### Development
+
+1. Install Docker.
+2. Clone this repository and `cd` into it.
+3. Create env files:
 
 ```bash
 cp .env.pennywise.example .env.pennywise
 cp .env.appwrite.example .env.appwrite
 ```
 
-4. Start the development environment:
+4. Start Appwrite + Pennywise stack:
 
 ```bash
 docker compose up
 ```
 
-This will start both Appwrite and the Pennywise backend.
-
-5. Open **http://localhost:8080** in your browser.
-6. Create an Appwrite account.
-7. Create a project and generate an API key with **full database access**.
-8. Configure your `.env.pennywise` file:
-
-- **APPWRITE_ENDPOINT**: `http://localhost:8080/v1`
-- **APPWRITE_PROJECT_ID**: Found in the Appwrite console.
-- **APPWRITE_API_KEY**: The API key generated in step 7.
-- **SESSION_SECRET**: A random string used by `express-session` to secure session handling.
-- **REDIS_URL**: `redis://pennywise-redis:6379`
-
-9. Initialize the database:
+5. Open `http://localhost:8080` and create your Appwrite account/project.
+6. Generate an Appwrite API key with full database access.
+7. Update `.env.pennywise` values:
+   - `APPWRITE_ENDPOINT=http://localhost:8080/v1`
+   - `APPWRITE_PROJECT_ID=<your-project-id>`
+   - `APPWRITE_API_KEY=<your-api-key>`
+   - `SESSION_SECRET=<random-secret>`
+   - `REDIS_URL=redis://pennywise-redis:6379`
+8. Bootstrap Appwrite TablesDB:
 
 ```bash
 npm run bootstrap
 ```
 
-Refer to the bootstrap note in the production section regarding asynchronous resource creation.
-
-10. Restart the containers:
+9. Restart containers:
 
 ```bash
 docker compose down
 docker compose up
 ```
 
-The application should now be fully operational.
+### Production (Appwrite)
 
-Hot reloading is enabled during development.
+1. Create an Appwrite Cloud/self-hosted project.
+2. Generate an API key with full access to database resources.
+3. Configure `.env.pennywise` for your production Appwrite endpoint and keys.
+4. Run Appwrite bootstrap:
+
+```bash
+npm run bootstrap
+```
+
+5. Build and run app image:
+
+```bash
+docker build -t pennywise-app .
+docker run --env-file .env.pennywise -p 3000:3000 pennywise-app
+```
+
+> Appwrite bootstrap note: Appwrite resource creation is asynchronous. If bootstrap fails while creating indexes/columns, rerun `npm run bootstrap` (safe and idempotent).
 
 ---
 
-# Code Structure
+## Option B — Run with PostgreSQL
+
+### Development
+
+1. Install Docker.
+2. Clone this repository and `cd` into it.
+3. Create `.env.pennywise` from example and fill required app settings:
+
+```bash
+cp .env.pennywise.example .env.pennywise
+```
+
+4. Start app + postgres + redis:
+
+```bash
+docker compose -f docker-compose.postgres.yml up
+```
+
+5. Bootstrap Postgres schema:
+
+```bash
+POSTGRES_CONNECTION_STRING=postgresql://pennywise:pennywise@localhost:5432/pennywise npm run bootstrap:postgres
+```
+
+6. If needed, restart the stack:
+
+```bash
+docker compose -f docker-compose.postgres.yml down
+docker compose -f docker-compose.postgres.yml up
+```
+
+### Production (PostgreSQL)
+
+1. Provision PostgreSQL and Redis instances.
+2. Set `POSTGRES_CONNECTION_STRING` and `REDIS_URL` for the app.
+3. Run Postgres bootstrap once against the target DB:
+
+```bash
+POSTGRES_CONNECTION_STRING=<your-production-connection-string> npm run bootstrap:postgres
+```
+
+4. Build and run app image:
+
+```bash
+docker build -t pennywise-app .
+docker run --env-file .env.pennywise -p 3000:3000 pennywise-app
+```
+
+---
+
+## Code Structure
 
 The application follows **Clean Architecture** principles and is organized into three primary layers:
 
-## Domain
+### Domain
 
 Defines the **core entities** of the system and the fundamental business concepts.
 
-## Application
+### Application
 
 Implements **use cases and business logic** involving domain entities.
 
@@ -140,7 +171,7 @@ These abstractions are defined as interfaces inside:
 src/application/ports
 ```
 
-## Infrastructure
+### Infrastructure
 
 Provides **concrete implementations** of the interfaces defined in the application layer.
 
