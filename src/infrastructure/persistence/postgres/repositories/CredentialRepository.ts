@@ -1,0 +1,8 @@
+import { CredentialRepository } from "@application/ports/repositories/CredentialRepository";import { TransactionContext } from "@application/ports/services/TransactionRunner";import { Credential } from "@entities/Credential";import { PostgresDatabaseService } from "@infrastructure/persistence/postgres/client/PostgresDatabaseService";import { UUID } from "node:crypto";
+type Row={id:string;user_id:string;type:'email_password';identifier:string;secret_hash:string}; const map=(r:Row)=>new Credential(r.id as UUID,r.user_id as UUID,r.type,r.identifier,r.secret_hash);
+export class PostgresCredentialRepository implements CredentialRepository { constructor(private readonly db: PostgresDatabaseService) {}
+async createOne(v:Credential,tx?:TransactionContext){await this.db.query("insert into credentials (id,user_id,type,identifier,secret_hash) values ($1,$2,$3,$4,$5)",[v.id,v.userId,v.type,v.identifier,v.secretHash],tx)}
+async findByIdentifier(identifier:string,tx?:TransactionContext){const r=await this.db.query<Row>("select * from credentials where identifier=$1",[identifier],tx);return r.rows[0]?map(r.rows[0]):undefined}
+async update(v:Credential,tx?:TransactionContext){await this.db.query("update credentials set user_id=$2,type=$3,identifier=$4,secret_hash=$5 where id=$1",[v.id,v.userId,v.type,v.identifier,v.secretHash],tx)}
+async deleteByIdentifier(identifier:string,tx?:TransactionContext){await this.db.query("delete from credentials where identifier=$1",[identifier],tx)}
+async deleteManyByUserId(userId:UUID,tx?:TransactionContext){await this.db.query("delete from credentials where user_id=$1",[userId],tx)} }

@@ -1,0 +1,11 @@
+import { BudgetLineItemRepository } from "@application/ports/repositories/BudgetLineItemRepository";import { TransactionContext } from "@application/ports/services/TransactionRunner";import { BudgetLineItem } from "@entities/BudgetLineItem";import { PostgresDatabaseService } from "@infrastructure/persistence/postgres/client/PostgresDatabaseService";import { UUID } from "node:crypto";
+type Row={id:string;budget_id:string;category_id:string;amount:number};const map=(r:Row)=>new BudgetLineItem(r.id as UUID,r.budget_id as UUID,r.category_id as UUID,r.amount);
+export class PostgresBudgetLineItemRepository implements BudgetLineItemRepository { constructor(private readonly db: PostgresDatabaseService) {}
+async createOne(v:BudgetLineItem,tx?:TransactionContext){await this.db.query("insert into budget_line_items (id,budget_id,category_id,amount) values ($1,$2,$3,$4)",[v.id,v.budgetId,v.categoryId,v.amount],tx)}
+async getOneById(id:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from budget_line_items where id=$1",[id],tx);return r.rows[0]?map(r.rows[0]):undefined}
+async getOneByBudgetIdAndCategoryId(budgetId:UUID,categoryId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from budget_line_items where budget_id=$1 and category_id=$2",[budgetId,categoryId],tx);return r.rows[0]?map(r.rows[0]):undefined}
+async getManyByBudgetId(budgetId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from budget_line_items where budget_id=$1",[budgetId],tx);return r.rows.map(map)}
+async includesCategory(categoryId:string,tx?:TransactionContext){const r=await this.db.query<{count:string}>("select count(*)::text as count from budget_line_items where category_id=$1",[categoryId],tx);return Number(r.rows[0]?.count||0)>0}
+async updateOne(v:BudgetLineItem,tx?:TransactionContext){await this.db.query("update budget_line_items set budget_id=$2,category_id=$3,amount=$4 where id=$1",[v.id,v.budgetId,v.categoryId,v.amount],tx)}
+async deleteOneById(id:UUID,tx?:TransactionContext){await this.db.query("delete from budget_line_items where id=$1",[id],tx)}
+async deleteManyByBudgetId(budgetId:string,tx?:TransactionContext){await this.db.query("delete from budget_line_items where budget_id=$1",[budgetId],tx)} }

@@ -1,0 +1,13 @@
+import { CollaborationRepository } from "@application/ports/repositories/CollaborationRepository";import { TransactionContext } from "@application/ports/services/TransactionRunner";import { Collaboration } from "@entities/Collaboration";import { PostgresDatabaseService } from "@infrastructure/persistence/postgres/client/PostgresDatabaseService";import { UUID } from "node:crypto";
+type Row={id:string;user_id:string;workspace_id:string;role:Collaboration["role"];date_created:Date}; const map=(r:Row)=>new Collaboration(r.id as UUID,r.user_id as UUID,r.workspace_id as UUID,r.role,new Date(r.date_created));
+export class PostgresCollaborationRepository implements CollaborationRepository { constructor(private readonly db: PostgresDatabaseService) {}
+async createOne(v:Collaboration,tx?:TransactionContext){await this.db.query("insert into collaborations (id,user_id,workspace_id,role,date_created) values ($1,$2,$3,$4,$5)",[v.id,v.userId,v.workspaceId,v.role,v.dateCreated],tx)}
+async getOneById(collaborationId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from collaborations where id=$1",[collaborationId],tx);return r.rows[0]?map(r.rows[0]):undefined}
+async getOneByUserIdAndWorkspaceId(userId:UUID,workspaceId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from collaborations where user_id=$1 and workspace_id=$2",[userId,workspaceId],tx);return r.rows[0]?map(r.rows[0]):undefined}
+async getManyByUserId(userId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from collaborations where user_id=$1",[userId],tx);return r.rows.map(map)}
+async getManyByWorkspaceId(workspaceId:UUID,tx?:TransactionContext){const r=await this.db.query<Row>("select * from collaborations where workspace_id=$1",[workspaceId],tx);return r.rows.map(map)}
+async doesUserOwnWorkspaces(userId:UUID,tx?:TransactionContext){const r=await this.db.query<{count:string}>("select count(*)::text as count from collaborations where user_id=$1 and role='owner'",[userId],tx);return Number(r.rows[0]?.count||0)>0}
+async updateRole(collaborationId:UUID,role:Collaboration['role'],tx?:TransactionContext){await this.db.query("update collaborations set role=$2 where id=$1",[collaborationId,role],tx)}
+async deleteOneById(id:UUID,tx?:TransactionContext){await this.db.query("delete from collaborations where id=$1",[id],tx)}
+async deleteManyByWorkspaceId(workspaceId:UUID,tx?:TransactionContext){await this.db.query("delete from collaborations where workspace_id=$1",[workspaceId],tx)}
+async deleteManyByUserId(userId:UUID,tx?:TransactionContext){await this.db.query("delete from collaborations where user_id=$1",[userId],tx)} }
